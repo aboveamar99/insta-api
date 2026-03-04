@@ -1,34 +1,23 @@
-import json
+from flask import Flask, request, jsonify
 import requests
 
-def handler(request):
+app = Flask(__name__)
 
-    try:
-        body = json.loads(request["body"])
-        url = body.get("url")
+@app.route("/api", methods=["POST"])
+def insta():
 
-        api = "https://tera.backend.live/allinone"
+    data = request.json
+    url = data.get("url")
 
-        r = requests.post(api, json={"url": url})
+    api = "https://tera.backend.live/allinone"
 
-        data = r.json()
+    r = requests.post(api, json={"url": url})
+    res = r.json()
 
-        video = data["video"][0]["video"]
-        thumbnail = data["video"][0]["thumbnail"]
+    video = res["video"][0]["video"]
+    thumbnail = res["video"][0]["thumbnail"]
 
-        return {
-            "statusCode": 200,
-            "body": json.dumps({
-                "video": video,
-                "thumbnail": thumbnail
-            })
-        }
-
-    except Exception as e:
-
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-                "error": str(e)
-            })
-        }
+    return jsonify({
+        "video": video,
+        "thumbnail": thumbnail
+    })
